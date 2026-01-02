@@ -111,6 +111,8 @@ curl -X POST http://localhost:8888/api/llm/call \
 
 **📖 Full Documentation**: [https://c3.unu.edu/projects/ai/llmbase/](https://c3.unu.edu/projects/ai/llmbase/)
 
+**📝 Blog Post**: [One API, Many AI Models](https://c3.unu.edu/blog/llmbase-one-api-many-ai-models)
+
 The complete HTML documentation is hosted online with:
 - Interactive navigation
 - Code examples
