@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Services Documentation</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #6366f1;
+            --background-color: #9cc6f0;
+            --card-background: #ffffff;
+            --text-color: #1f2937;
+            --text-secondary: #181d23;
+            --border-color: #e5e7eb;
+            --code-bg: #f3f4f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --accent-color: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            padding: 20px;
+            padding-bottom: 60px; /* Space for fixed footer */
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #ffffff;
+            color: #1f2937;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.95;
+            margin-bottom: 4px;
+        }
+
+        .version {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card {
+            background: var(--card-background);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin: 20px 0 10px;
+        }
+
+        h4 {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin: 15px 0 5px;
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .feature-list {
+            list-style-type: none;
+            margin-left: 0;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .feature-list li::before {
+            content: "✓";
+            color: var(--success-color);
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            border-left: 4px solid var(--accent-color);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .provider-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .provider-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.1);
+        }
+
+        .provider-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .provider-models {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Setup Grid (Fixes Layout Issue) */
+        .setup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .usage-example {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .example-code {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .file-name {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 5px;
+            font-family: monospace;
+            display: block;
+            font-weight: bold;
+        }
+
+        .alert-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border: 1px solid #fcd34d;
+            color: #92400e;
+        }
+
+        .alert-info {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background-color: #f8fafc;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .resilience-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .param-badge {
+            font-family: monospace;
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        /* Fixed Footer */
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
+            font-size: 0.7rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            /* Stack setup columns on smaller screens */
+            .setup-grid, .resilience-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            nav {
+                flex-wrap: wrap;
+            }
+            nav a {
+                font-size: 0.75rem;
+                padding: 8px 10px;
+            }
+        }
+
+        /* Sticky Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 12px 20px;
+            margin: -20px -20px 20px -20px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 50;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+        }
+
+        nav a:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        section {
+            scroll-margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="#overview">Overview</a>
+            <a href="#providers">Providers</a>
+            <a href="#resilience">Resilience</a>
+            <a href="#setup">Setup</a>
+            <a href="#api">API</a>
+            <a href="#best-practices">Best Practices</a>
+            <a href="#usage">Usage Modes</a>
+            <a href="#integration">Integration</a>
+            <a href="#example">Standalone Example</a>
+        </nav>
+
+        <header>
+            <div class="header-content">
+                <h1>LLM Services</h1>
+                Unified API for Multiple LLM Providers<br>
+                Build once, run anywhere: One API for all your LLMs, cloud or local<br>
+                <div class="version">v1.6.0 (Conditional Flask - Library Mode)</div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <section id="overview" class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚡</div>
+                    <div>
+                        <h2>Overview</h2>
+                        <p>LLM Services provides a unified interface for interacting with multiple Large Language Model providers. It abstracts provider-specific complexities, allowing you to switch models via configuration without changing code logic.</p>
+                    </div>
+                </div>
+
+                <p><strong>Key Features:</strong></p>
+                <ul class="feature-list">
+                    <li><strong>Multi-Provider:</strong> Support for multiple LLM providers, enabling flexible selection based on compliance, cost, and performance requirements.</li>
+                    <li><strong>Structured Output:</strong> Built-in json_mode ensures responses are valid JSON objects, regardless of the underlying provider.</li>
+                    <li><strong>Dynamic Ollama:</strong> Automatically discovers local models from your Ollama instance.</li>
+                    <li><strong>Resilience:</strong> Automatic retries and circuit breakers for high availability.</li>
+                    <li><strong>Advanced Logic:</strong> Support for "Thinking" models and streaming responses.</li>
+                    <li><strong>Conditional Flask:</strong> Use as a library (no Flask required) or API server (Flask optional).</li>
+                </ul>
+            </section>
+
+            <section id="providers" class="card">
+                <div class="card-header">
+                    <div class="card-icon">🏗️</div>
+                    <div>
+                        <h2>Supported Providers</h2>
+                        <p>Access leading Cloud and Local LLMs through a single interface.</p>
+                    </div>
+                </div>
+
+                <div class="provider-grid">
+                    <div class="provider-card">
+                        <div class="provider-name">OpenAI / Azure</div>
+                        <div class="provider-models">GPT-4o, o1</div>
+                    </div>
+                    <div class="provider-card">
+                        <div class="provider-name">Anthropic</div>
+                        <div class="provider-models">Claude 3.5, 3.7</div>
+                    </div>
+                    <div class="provider-card">
+                        <div class="provider-name">Gemini</div>
+                        <div class="provider-models">Gemini 2.5, 3</div>
+                    </div>
+                    <div class="provider-card">
+                        <div class="provider-name">DeepSeek</div>
+                        <div class="provider-models">V3, R1 Reasoner</div>
+                    </div>
+                    <div class="provider-card">
+                        <div class="provider-name">Ollama</div>
+                        <div class="provider-models">Local Models</div>
+                    </div>
+                </div>
+                <div class="alert-box alert-warning">
+                    <strong>Note:</strong> Ollama models require no manual configuration. If the endpoint is set, the service automatically fetches all available local models.
+                </div>
+            </section>
+
+            <section id="resilience" class="card full-width">
+                <div class="card-header">
+                    <div class="card-icon">🛡️</div>
+                    <div>
+                        <h2>Resilience Architecture</h2>
+                        <p>Built-in fault tolerance mechanisms to ensure high availability. Settings can be tuned in <code>llm_config.json</code>.</p>
+                    </div>
+                </div>
+
+                <div class="resilience-grid">
+                    <div>
+                        <h3>Configuration Parameters</h3>
+                        <p>The resilience behavior is controlled by the following parameters in the root <code>"resilience"</code> block of your config file.</p>
+
+                        <table class="comparison-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Default</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-badge">max_retries</span></td>
+                                    <td>Int</td>
+                                    <td>3</td>
+                                    <td>Number of retry attempts for transient errors (e.g., 5xx errors, rate limits, timeouts).</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="param-badge">backoff_factor</span></td>
+                                    <td>Float</td>
+                                    <td>1.5</td>
+                                    <td>Multiplier for calculating wait time between retries. Formula: <code>wait = factor ^ attempt</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="param-badge">circuit_breaker_failure_threshold</span></td>
+                                    <td>Int</td>
+                                    <td>5</td>
+                                    <td>Consecutive failures allowed before a provider is blocked (Circuit Open state).</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="param-badge">circuit_breaker_recovery_timeout</span></td>
+                                    <td>Int</td>
+                                    <td>60</td>
+                                    <td>Seconds to wait before testing a blocked provider again (Half-Open state).</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert-box alert-info">
+                        <strong>Note on Timeouts:</strong> HTTP connection timeouts are handled internally by the application (Standard: 300s for Ollama, Default client settings for others). The parameters above control <em>application-level</em> retry logic and circuit breaking.
+                    </div>
+                </div>
+            </section>
+
+            <section id="setup" class="card full-width">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div>
+                        <h2>Setup & Configuration</h2>
+                        <p>The service separates secrets (API keys) from logic (Model definitions).</p>
+                    </div>
+                </div>
+
+                <div class="setup-grid">
+                    <div>
+                        <h3>1. Requirements & Secrets</h3>
+                        <p>Install packages and set environment variables.</p>
+                        <div class="code-block"># Core requirements (Library mode - no Flask)
+pip install python-dotenv openai anthropic google-genai requests urllib3
+
+# Optional: For API server mode
+pip install flask flask-session</div>
+                        <h3>2. Environment Variables (.env)</h3>
+                        <p>Store your API keys and endpoints here. Do not commit this file.</p>
+                        <span class="file-name">.env</span>
+                        <div class="code-block"># Provider Keys
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=...
+DEEPSEEK_API_KEY=sk-...
+
+# Azure (Optional)
+AZURE_OAI_ENDPOINT=https://your-resource.azure.com/
+AZURE_OAI_KEY=...
+
+# Ollama (Optional)
+OLLAMA_CHAT_ENDPOINT=http://localhost:11434/api/chat
+OLLAMA_MODELS_ENDPOINT=http://localhost:11434/api/models
+
+# Service Config
+FLASK_SECRET_KEY=your-secret-key
+LLM_CONFIG_FILE=llm_config.json
+
+# API Mode (Optional - set to true to enable Flask API server)
+LLM_API_MODE=false</div>
+                        <div class="alert-box alert-info">
+                            <strong>Library Mode:</strong> When <code>LLM_API_MODE=false</code> (default), you can use <code>LLMService</code> as a Python library without installing Flask. Set <code>LLM_API_MODE=true</code> to enable the HTTP API server.
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3>3. Model & Resilience Configuration (llm_config.json)</h3>
+                        <p>Define models and resilience behaviors. This file can be hot-reloaded.</p>
+                        <span class="file-name">llm_config.json</span>
+                        <div class="code-block">{
+  "resilience": {
+    "max_retries": 3,
+    "backoff_factor": 1.5,
+    "retry_jitter": 0.5,
+    "circuit_breaker_failure_threshold": 5,
+    "circuit_breaker_recovery_timeout": 60
+  },
+  "openai": {
+    "api_base": "https://api.openai.com/v1",
+    "default_model": "gpt-4o",
+    "models": {
+      "gpt-4o": {
+        "max_tokens": 16384,
+        "supports_streaming": true,
+        "temperature_default": 0.3
+      }
+    }
+  },
+  "anthropic": {
+    "models": {
+      "claude-3-5-sonnet-20240620": {
+        "max_tokens": 8192,
+        "supports_extended_thinking": true
+      }
+    }
+  }
+}</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="api" class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔌</div>
+                    <div>
+                        <h2>API Endpoints</h2>
+                        <p>RESTful API endpoints for interaction and management.</p>
+                    </div>
+                </div>
+
+                <h3>LLM Call Endpoint</h3>
+                <div class="code-block">POST /api/llm/call
+{
+    "provider": "openai",
+    "model": "gpt-4o",
+    "prompt": "List 3 colors and their hex codes",
+    "json_mode": true,
+    "stream": false,
+    "temperature": 0.3,
+    "system_prompt": "You are a color theorist."
+}</div>
+
+                <h3>Config Reload Endpoint</h3>
+                <div class="code-block">POST /api/config/reload
+{
+    "config_file": "llm_config.json"
+}</div>
+            </section>
+
+            <section id="best-practices" class="card">
+                <div class="card-header">
+                    <div class="card-icon">🏆</div>
+                    <div>
+                        <h2>Best Practices</h2>
+                        <p>Guidelines for optimal performance and security.</p>
+                    </div>
+                </div>
+
+                <ul class="feature-list">
+                    <li><div><strong>JSON Mode:</strong> Use <code>"json_mode": true</code> when building tools that require structured data parsing (e.g., dashboards, extracting data from CVs).</div></li>
+                    <li><div><strong>Use Configuration Files:</strong> Keep model definitions in <code>llm_config.json</code> to allow hot-swapping models without code changes.</div></li>
+                    <li><div><strong>Temperature Settings:</strong> Use <code>0.3</code> for factual tasks and <code>0.7-1.0</code> for creative writing.</div></li>
+                    <li><div><strong>Enable Thinking:</strong> For logic or math, use models like o1 or R1 and set <code>"enable_thinking": true</code>.</div></li>
+                    <li><div><strong>Streaming:</strong> Always use <code>"stream": true</code> for long-form generation to improve UX.</div></li>
+                </ul>
+            </section>
+
+            <section id="usage" class="card full-width">
+                <div class="card-header">
+                    <div class="card-icon">💻</div>
+                    <div>
+                        <h2>Usage Modes</h2>
+                        <p>Use as a standalone Python library or as an HTTP API server.</p>
+                    </div>
+                </div>
+
+                <div class="usage-example">
+                    <h3>Library Mode (Default)</h3>
+                    <p>Import and use <code>LLMService</code> directly in your Python code. No Flask required.</p>
+                    <div class="example-code">
+                        <pre>from llmservices import LLMService, LLMRequest
+
+req = LLMRequest(provider="openai", model="gpt-4o", prompt="Hello")
+response = LLMService.call(req)
+print(response.content)</pre>
+                    </div>
+                </div>
+
+                <div class="usage-example">
+                    <h3>API Server Mode</h3>
+                    <p>Set <code>LLM_API_MODE=true</code> and run as an HTTP server.</p>
+                    <div class="example-code">
+                        <pre># Enable API mode in .env
+export LLM_API_MODE=true
+
+# Run the server
+python llmservices.py
+
+# Or programmatically
+from llmservices import run_api_server
+run_api_server(port=8888)</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="integration" class="card full-width">
+                <div class="card-header">
+                    <div class="card-icon">💻</div>
+                    <div>
+                        <h2>Python Integration Patterns</h2>
+                        <p>Choose the integration method that fits your architecture.</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3>Comparison: API vs. Direct Class</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>API Approach (HTTP)</th>
+                                <th>Direct Approach (Class)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Use Case</strong></td>
+                                <td>Microservices, Frontend-to-Backend, Polyglot systems</td>
+                                <td>Internal Python Tools, Monolithic Backends</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>Network overhead introduced</td>
+                                <td>No network overhead (Zero latency)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Structure</strong></td>
+                                <td>Raw JSON Responses</td>
+                                <td>Typed Objects (<code>LLMResponse</code>)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="usage-example">
+                    <h3>Method 1: API Approach (HTTP)</h3>
+                    <p>Best for decoupled services or when calling from non-Python languages.</p>
+                    <div class="example-code">
+                        <pre>import requests
+import json
+
+# Standard API call
+url = 'http://localhost:8888/api/llm/call'
+payload = {
+    'provider': 'deepseek',
+    'model': 'deepseek-reasoner',
+    'prompt': 'Solve this complex logic puzzle...',
+    'enable_thinking': True,
+    'stream': True
+}
+
+try:
+    response = requests.post(url, json=payload, stream=True)
+
+    # Check for Circuit Breaker (503) or other errors
+    if response.status_code == 503:
+        error_data = response.json()
+        print(f"⛔ Circuit Breaker Open: {error_data['error']}")
+    elif response.status_code != 200:
+        print(f"⚠ Error {response.status_code}: {response.text}")
+    else:
+        # Process successful stream
+        for line in response.iter_lines():
+            if line:
+                decoded_line = line.decode('utf-8')
+                if decoded_line.startswith('data: '):
+                    print(decoded_line)
+except requests.exceptions.ConnectionError:
+    print("❌ Could not connect to the LLM Service API.")</pre>
+                    </div>
+
+                    <h3>Method 2: Direct Approach (LLMService Class)</h3>
+                    <p>Best for high-performance internal Python scripts with simple streaming.</p>
+                    <div class="example-code">
+                        <pre>from llmservices import LLMService, LLMRequest, CircuitBreakerOpenException
+
+# Create typed request object
+llm_request = LLMRequest(
+    provider='deepseek',
+    model='deepseek-reasoner',
+    prompt='Write a short poem about AI.',
+    enable_thinking=True,
+    stream=True
+)
+
+# Call the LLM service directly (No HTTP overhead)
+try:
+    for chunk in LLMService.stream(llm_request):
+        print(chunk, end='', flush=True)
+except CircuitBreakerOpenException as e:
+    print(f"Service Unavailable: {e}")
+except Exception as e:
+    print(f"Error: {e}")</pre>
+                    </div>
+                </div>
+
+                <div class="usage-example">
+                    <h3>Method 3: Structured JSON Output</h3>
+                    <p>Best for extracting data or building software tools. Works with all providers.</p>
+                    <div class="example-code">
+                        <pre>from llmservices import LLMService, LLMRequest
+import json
+
+llm_request = LLMRequest(
+    provider='openai',  # Works with anthropic, gemini, etc.
+    model='gpt-4o',
+    prompt='Extract names and dates from the text: "Meeting with Sarah on 2025-05-12."',
+    json_mode=True  # <--- Forces valid JSON output
+)
+
+response = LLMService.call(llm_request)
+
+# Parse response as standard JSON
+data = json.loads(response.content)
+print(data)
+# Output: {"names": ["Sarah"], "dates": ["2025-05-12"]}</pre>
+                    </div>
+                </div>
+
+                <div class="usage-example">
+                    <h3>Method 4: Streaming with JSON Mode (Advanced)</h3>
+                    <p>Best for real-time JSON responses. Shows SSE parsing to handle the <code>[DONE]</code> marker.</p>
+                    <div class="example-code">
+                        <pre>from llmservices import LLMService, LLMRequest
+import json
+
+def parse_stream_chunk(chunk: str) -> str:
+    """Parse SSE format and extract text content."""
+    chunk = chunk.strip()
+    if chunk.startswith('data: '):
+        data_part = chunk[6:]  # Remove "data: " prefix
+        if data_part.strip() == '[DONE]':
+            return ''  # Filter out stream end marker
+        try:
+            data = json.loads(data_part)
+            if 'chunk' in data:
+                return data['chunk']
+            elif 'delta' in data and 'content' in data['delta']:
+                return data['delta']['content']
+            elif 'content' in data:
+                return data['content']
+        except json.JSONDecodeError:
+            pass
+    return chunk
+
+# Stream JSON response
+llm_request = LLMRequest(
+    provider='openai',
+    model='gpt-4o',
+    prompt='List 3 programming languages with their release years.',
+    json_mode=True,
+    stream=True
+)
+
+full_response = ""
+for raw_chunk in LLMService.stream(llm_request):
+    text = parse_stream_chunk(raw_chunk)
+    if text:  # Skip empty strings (filters out [DONE])
+        print(text, end='', flush=True)
+        full_response += text
+
+# Parse the accumulated JSON
+data = json.loads(full_response)
+print(f"\nParsed: {json.dumps(data, indent=2)}")</pre>
+                    </div>
+                    <div class="alert-box alert-info">
+                        <strong>Note on [DONE] marker:</strong> When streaming, the service sends <code>data: [DONE]</code> as the final chunk. The <code>parse_stream_chunk()</code> helper returns an empty string for this marker. Use <code>if text:</code> checks when accumulating content to skip it.
+                    </div>
+                </div>
+            </section>
+
+            <section id="example" class="card full-width">
+                <div class="card-header">
+                    <div class="card-icon">📄</div>
+                    <div>
+                        <h2>Complete Standalone Example</h2>
+                        <p>A complete, runnable example showing library mode setup from scratch.</p>
+                    </div>
+                </div>
+
+                <div class="example-code">
+                    <pre>"""
+Example of using llmservices in Library Mode with Streaming Enabled
+
+This example demonstrates how to use LLMService as a Python library
+(without Flask) to stream responses from an LLM provider.
+
+Prerequisites:
+1. Install required packages:
+   pip install python-dotenv openai anthropic google-genai requests urllib3
+
+2. Set up your .env file with API keys:
+   The .env file can be located in either:
+   - This directory (llmbase_demo/.env) - for local configuration
+   - Parent llmbase directory (llmbase/.env) - shared configuration
+
+   Example .env file:
+   OPENAI_API_KEY=sk-...
+   ANTHROPIC_API_KEY=sk-ant-...
+   GEMINI_API_KEY=...
+   LLM_CONFIG_FILE=llm_config.json
+
+3. (Optional) Create llm_config.json with custom model configurations
+   - Default config: llmbase/llm_config.json (already exists with sensible defaults)
+   - Local override: Create llmbase_demo/llm_config.json for project-specific settings
+   - Useful for overriding default settings like max_tokens, temperature, etc.
+"""
+
+import os
+import json
+from dotenv import load_dotenv
+import sys
+from pathlib import Path
+
+# ============================================================================
+# PATH CONFIGURATION
+# ============================================================================
+# Add parent llmbase directory to Python path for imports
+# This allows importing llmservices from a sibling directory
+# Example structure:
+#   /Users/cio/gai/
+#     ├── llmbase/           (contains llmservices.py)
+#     └── llmbase_demo/      (contains this file)
+sys.path.insert(0, str(Path(__file__).parent.parent / "llmbase"))
+
+
+# ============================================================================
+# LLM SERVICE IMPORTS
+# ============================================================================
+from llmservices import LLMService, LLMRequest, CircuitBreakerOpenException
+# LLMService: Main class for making LLM calls
+# LLMRequest: Data class for request parameters
+# CircuitBreakerOpenException: Raised when provider is blocked due to failures
+
+# ============================================================================
+# ENVIRONMENT SETUP
+# ============================================================================
+# Load environment variables from .env file
+# Required: OPENAI_API_KEY, ANTHROPIC_API_KEY, GEMINI_API_KEY, etc.
+# Optional: LLM_CONFIG_FILE (defaults to llm_config.json)
+load_dotenv()
+
+
+def parse_stream_chunk(chunk: str) -> str:
+    """
+    Parse SSE (Server-Sent Events) format and extract the text content.
+
+    Handles formats like:
+    - data: {"chunk": "text"}
+    - data: {"delta": {"content": "text"}}
+    - data: [DONE] (stream end marker)
+    - raw text
+
+    Returns:
+        str: The extracted text content, or empty string for [DONE] markers
+    """
+    chunk = chunk.strip()
+
+    # Handle SSE format: data: {...}
+    if chunk.startswith('data: '):
+        data_part = chunk[6:]  # Remove "data: " prefix
+
+        # Check for stream end marker
+        if data_part.strip() == '[DONE]':
+            return ''  # Signal end of stream
+
+        try:
+            data = json.loads(data_part)
+
+            # Try different possible keys for the content
+            if 'chunk' in data:
+                return data['chunk']
+            elif 'delta' in data and 'content' in data['delta']:
+                return data['delta']['content']
+            elif 'content' in data:
+                return data['content']
+            elif 'text' in data:
+                return data['text']
+        except json.JSONDecodeError:
+            pass
+
+    # Return as-is if not SSE format or parsing failed
+    return chunk
+
+
+def stream_basic_example():
+    """Basic streaming example with default settings."""
+    llm_request = LLMRequest(
+        provider='openai',
+        model='gpt-4o',
+        prompt='Write a short haiku about artificial intelligence.',
+        stream=True  # Enable streaming
+    )
+
+    try:
+        for raw_chunk in LLMService.stream(llm_request):
+            text = parse_stream_chunk(raw_chunk)
+            print(text, end='', flush=True)
+        print()
+    except CircuitBreakerOpenException as e:
+        print(f"Service Unavailable (Circuit Breaker): {e}")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+# Run the example
+if __name__ == "__main__":
+    stream_basic_example()</pre>
+                </div>
+                <div class="alert-box alert-info">
+                    <strong>Ready to run:</strong> Save this as a Python file (e.g., <code>streaming_example.py</code>) and run it directly. All required setup including path configuration, imports, and environment loading is included.
+                </div>
+            </section>
+        </div>
+
+        <footer>
+            <p>Unified LLM Services API | v1.6.0 (Conditional Flask) | By Ng Chong </p>
+        </footer>
+    </div>
+</body>
+</html>

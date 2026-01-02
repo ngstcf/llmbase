@@ -1,0 +1,10 @@
+include README.md
+include LICENSE
+include pyproject.toml
+include requirements.txt
+include llm_config.json
+include .env.example
+recursive-include examples *.py
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+exclude .gitignore

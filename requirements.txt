@@ -1,0 +1,16 @@
+# Core dependencies (Library mode - no Flask required)
+python-dotenv>=1.0.0
+openai>=1.0.0
+anthropic>=0.18.0
+google-genai>=1.0.0
+requests>=2.31.0
+urllib3>=2.0.0
+
+# Optional: For API server mode
+# Uncomment the following if you want to run the Flask API server
+# flask>=3.0.0
+# flask-session>=0.5.0
+
+# Additional utilities (optional)
+colorama>=0.4.0
+PyMuPDF>=1.0.0
