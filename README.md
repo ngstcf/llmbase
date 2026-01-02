@@ -164,7 +164,14 @@ Create `llm_config.json`:
       "gpt-4o": {
         "max_tokens": 16384,
         "supports_streaming": true,
-        "temperature_default": 0.3
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false
+      },
+      "o1": {
+        "max_tokens": 100000,
+        "supports_streaming": false,
+        "supports_reasoning": true,
+        "uses_completion_tokens": true
       }
     }
   },
@@ -174,24 +181,27 @@ Create `llm_config.json`:
       "claude-sonnet-4-5-20250929": {
         "max_tokens": 8192,
         "supports_streaming": true,
-        "supports_extended_thinking": true
+        "supports_extended_thinking": true,
+        "uses_completion_tokens": false
       }
     }
   }
 }
 ```
 
+> **Note**: The `uses_completion_tokens` field indicates whether the model uses `max_completion_tokens` instead of `max_tokens` in the API request (e.g., OpenAI o1 series). Set to `true` for reasoning models that require this parameter.
+
 ### Supported Providers
 
-| Provider | Models | Notes |
-|----------|--------|-------|
-| OpenAI | GPT-4o, o1 | Full support including reasoning |
-| Azure OpenAI | GPT models | Same as OpenAI with Azure endpoint |
-| Anthropic | Claude 3.5/3.7 | Extended thinking support |
-| Google Gemini | Gemini 2.5, 3 | Native JSON mode |
-| DeepSeek | V3, R1 | Reasoning model support |
-| Perplexity | Sonar, Sonar Pro | Web-search enhanced |
-| Ollama | Local models | Auto-discovery |
+| Provider | Models |
+|----------|--------|
+| OpenAI | GPT-4o, o1 |
+| Azure OpenAI | GPT models |
+| Anthropic | Claude 3.5/3.7 |
+| Google Gemini | Gemini 2.5, 3 |
+| DeepSeek | V3, R1 |
+| Perplexity | Sonar, Sonar Pro |
+| Ollama | Local models |
 
 ---
 
