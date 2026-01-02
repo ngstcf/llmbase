@@ -376,17 +376,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Ng Chong**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-
----
-
-## 🙏 Acknowledgments
-
-- OpenAI for the GPT models
-- Anthropic for Claude
-- Google for Gemini
-- DeepSeek for the reasoning models
-- All contributors to the open-source AI community
+- GitHub: [@ngstcf](https://github.com/ngstcf)
 
 ---
 
