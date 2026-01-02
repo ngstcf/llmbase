@@ -8,7 +8,7 @@ Build once, run anywhere: One API for all your LLMs, cloud or local
 
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.6.0-orange)]https://github.com/yourusername/llmservices)
+[![Version](https://img.shields.io/badge/version-1.6.0-orange)]https://github.com/ngstcf/llmservices)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://c3.unu.edu/projects/ai/llmbase/)
 
 [Features](#-key-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Examples](#-examples)
