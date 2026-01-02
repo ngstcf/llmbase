@@ -193,14 +193,14 @@ Create `llm_config.json`:
 
 ### Supported Providers
 
-| Provider | Models |
-|----------|--------|
-| OpenAI | GPT-4o, o1 |
-| Azure OpenAI | GPT models |
-| Anthropic | Claude 3.5/3.7 |
-| Google Gemini | Gemini 2.5, 3 |
-| DeepSeek | V3, R1 |
-| Perplexity | Sonar, Sonar Pro |
+| Provider | Description |
+|----------|-------------|
+| OpenAI | GPT models |
+| Azure OpenAI | GPT models via Azure |
+| Anthropic | Claude models |
+| Google Gemini | Gemini models |
+| DeepSeek | Chat and reasoning models |
+| Perplexity | Sonar models |
 | Ollama | Local models |
 
 ---
