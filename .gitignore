@@ -155,8 +155,4 @@ llm_services_example.py
 test_llm*.py
 test_report_*.json
 blog-article.md
-s.html
-s2.html
-s3.html
-specs_v*.html
 PYPI_PUBLISHING_GUIDE.md
