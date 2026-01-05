@@ -205,6 +205,7 @@ def _register_flask_routes():
                 'anthropic': clients.anthropic is not None,
                 'gemini': clients.gemini is not None,
                 'deepseek': os.environ.get("DEEPSEEK_API_KEY") is not None,
+                'xai': os.environ.get("XAI_API_KEY") is not None,
                 'perplexity': os.environ.get("PERPLEXITY_API_KEY") is not None,
                 'ollama': os.environ.get("OLLAMA_CHAT_ENDPOINT") is not None
             },
@@ -308,6 +309,7 @@ class Provider(Enum):
     GEMINI = "gemini"
     PERPLEXITY = "perplexity"
     DEEPSEEK = "deepseek"
+    XAI = "xai"
     OLLAMA = "ollama"
 
 
@@ -915,6 +917,39 @@ class DeepSeekProvider:
         return OpenAIProvider.call(req, client, extra_body=extra_body)
 
 
+class XAIProvider:
+    """xAI Grok API with reasoning support
+
+    xAI's Grok API is OpenAI-compatible and supports models like:
+    - grok-beta, grok-3: Standard models
+    - grok-4: Reasoning model (always in reasoning mode, no non-reasoning option)
+
+    Note: Grok 4 does not support reasoning_effort parameter. Reasoning is automatic.
+    Supported parameters: presence_penalty, frequency_penalty, stop (not for grok-4).
+    """
+
+    @staticmethod
+    def call(req: LLMRequest) -> LLMResponse:
+        api_key = os.environ.get("XAI_API_KEY")
+        if not api_key:
+            raise Exception("xAI API key not configured. Set XAI_API_KEY environment variable.")
+
+        messages = req.messages if req.messages else [{"role": "user", "content": req.prompt}]
+        if req.system_prompt and not any(m.get("role") == "system" for m in messages):
+            messages.insert(0, {"role": "system", "content": req.system_prompt})
+
+        req.messages = messages
+
+        client = OpenAI(
+            api_key=api_key,
+            base_url="https://api.x.ai/v1"
+        )
+
+        # Reuse OpenAI Logic which handles json_mode = response_format={"type": "json_object"}
+        # Note: Grok 4 reasoning_content will be captured if present in response
+        return OpenAIProvider.call(req, client)
+
+
 class OllamaProvider:
     """Custom Ollama endpoint (OpenAI-compatible)"""
     
@@ -1030,13 +1065,16 @@ class LLMService:
         
         elif provider == "deepseek":
             return lambda: DeepSeekProvider.call(req)
-        
+
+        elif provider == "xai":
+            return lambda: XAIProvider.call(req)
+
         elif provider == "perplexity":
             api_key = os.environ.get("PERPLEXITY_API_KEY")
             if not api_key: raise Exception("Perplexity API key not configured")
             client = OpenAI(api_key=api_key, base_url="https://api.perplexity.ai")
             return lambda: OpenAIProvider.call(req, client)
-        
+
         elif provider == "ollama":
             return lambda: OllamaProvider.call(req)
         
@@ -1092,6 +1130,11 @@ class LLMService:
                 api_key = os.environ.get("DEEPSEEK_API_KEY")
                 if not api_key: raise Exception("DeepSeek API key not configured")
                 client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
+                return OpenAIProvider.stream(req, client)
+            elif provider == "xai":
+                api_key = os.environ.get("XAI_API_KEY")
+                if not api_key: raise Exception("xAI API key not configured")
+                client = OpenAI(api_key=api_key, base_url="https://api.x.ai/v1")
                 return OpenAIProvider.stream(req, client)
             elif provider == "perplexity":
                 api_key = os.environ.get("PERPLEXITY_API_KEY")

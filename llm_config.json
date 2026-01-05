@@ -1,0 +1,270 @@
+{
+  "resilience": {
+    "max_retries": 3,
+    "backoff_factor": 1.5,
+    "retry_jitter": 0.5,
+    "circuit_breaker_failure_threshold": 5,
+    "circuit_breaker_recovery_timeout": 60
+  },
+  "openai": {
+    "api_base": "https://api.openai.com/v1",
+    "default_model": "gpt-4o",
+    "models": {
+      "gpt-5.2": {
+        "max_tokens": 100000,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2025"
+      },
+      "gpt-5.1": {
+        "max_tokens": 100000,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2025"
+      },
+      "gpt-5": {
+        "max_tokens": 100000,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2025"
+      },
+      "o1": {
+        "max_tokens": 100000,
+        "supports_streaming": false,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      },
+      "gpt-4o": {
+        "max_tokens": 16384,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      },
+      "gpt-4o-mini": {
+        "max_tokens": 16384,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      }
+    }
+  },
+  "anthropic": {
+    "api_version": "2023-06-01",
+    "default_model": "claude-sonnet-4.5-20250929",
+    "models": {
+      "claude-opus-4.5-20251101": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-haiku-4.5-20251015": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-sonnet-4.5-20250929": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-opus-4.1-20250805": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-sonnet-4-20250522": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-opus-4-20250522": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-sonnet-3.7-20250224": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2024"
+      },
+      "claude-3-5-sonnet-20241022": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Apr 2024"
+      },
+      "claude-3-5-haiku-20241022": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Jul 2024"
+      }
+    }
+  },
+  "gemini": {
+    "api_base": "https://generativelanguage.googleapis.com",
+    "default_model": "gemini-2.5-flash",
+    "models": {
+      "gemini-2.5-pro": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Nov 2024"
+      },
+      "gemini-2.5-flash": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Nov 2024"
+      }
+    }
+  },
+  "deepseek": {
+    "api_base": "https://api.deepseek.com",
+    "default_model": "deepseek-chat",
+    "models": {
+      "deepseek-reasoner": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "May 2024"
+      },
+      "deepseek-chat": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "May 2024"
+      }
+    }
+  },
+  "xai": {
+    "api_base": "https://api.x.ai/v1",
+    "default_model": "grok-beta",
+    "models": {
+      "grok-4": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Nov 2024"
+      },
+      "grok-3": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Nov 2024"
+      },
+      "grok-beta": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Nov 2024"
+      }
+    }
+  },
+  "perplexity": {
+    "api_base": "https://api.perplexity.ai",
+    "default_model": "sonar",
+    "models": {
+      "sonar": {
+        "max_tokens": 127072,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": null
+      },
+      "sonar-pro": {
+        "max_tokens": 127072,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": null
+      },
+      "sonar-reasoning-pro": {
+        "max_tokens": 127072,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": null
+      }
+    }
+  }
+}
