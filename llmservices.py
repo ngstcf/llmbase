@@ -565,12 +565,22 @@ class OpenAIProvider:
     """OpenAI and compatible providers"""
     
     @staticmethod
-    def call(req: LLMRequest, client, api_base: str = None) -> LLMResponse:
-        """Unified OpenAI-compatible API call"""
+    def call(req: LLMRequest, client, api_base: str = None, extra_body: dict = None) -> LLMResponse:
+        """Unified OpenAI-compatible API call
+
+        Args:
+            req: LLMRequest object
+            client: OpenAI client instance
+            api_base: Optional API base URL (for backward compatibility)
+            extra_body: Optional extra_body dict for provider-specific parameters (e.g., DeepSeek thinking)
+
+        Returns:
+            LLMResponse object
+        """
         config = get_model_config(req.provider, req.model)
-        
+
         messages = req.messages if req.messages else [{"role": "user", "content": req.prompt}]
-        
+
         # Handle System Prompt Merging
         if req.system_prompt and not any(m.get("role") == "system" for m in messages):
             # For O1/Reasoning models, some don't support system, but we handle it generally here
@@ -586,7 +596,7 @@ class OpenAIProvider:
             "messages": messages,
             "stream": req.stream
         }
-        
+
         # JSON Mode Support
         if req.json_mode:
             params["response_format"] = {"type": "json_object"}
@@ -605,7 +615,11 @@ class OpenAIProvider:
         else:
             params["max_tokens"] = req.max_tokens or config.max_tokens
             params["temperature"] = req.temperature if req.temperature is not None else config.temperature_default
-        
+
+        # Add extra_body if provided (for provider-specific params like DeepSeek thinking)
+        if extra_body:
+            params.update(extra_body)
+
         try:
             response = client.chat.completions.create(**params)
             
@@ -858,36 +872,47 @@ class GeminiProvider:
 
 
 class DeepSeekProvider:
-    """DeepSeek API with R1 reasoning support"""
-    
+    """DeepSeek API with R1 reasoning support
+
+    When enable_thinking=True:
+    - For deepseek-chat: API automatically routes to deepseek-reasoner internally
+    - For deepseek-reasoner: Thinking is automatic by default
+    Response includes reasoning_content with thinking tokens.
+
+    Note: DeepSeek does not support effort levels (unlike OpenAI's reasoning_effort).
+    Thinking is either enabled or disabled via enable_thinking boolean.
+    """
+
     @staticmethod
     def call(req: LLMRequest) -> LLMResponse:
         api_key = os.environ.get("DEEPSEEK_API_KEY")
         if not api_key:
             raise Exception("DeepSeek API key not configured")
-        
+
         config = get_model_config(req.provider, req.model)
-        
+
         messages = req.messages if req.messages else [{"role": "user", "content": req.prompt}]
         if req.system_prompt and not any(m.get("role") == "system" for m in messages):
             messages.insert(0, {"role": "system", "content": req.system_prompt})
 
         # DeepSeek specific reasoning setup
+        # For deepseek-chat: use extra_body to enable thinking tokens (API routes to deepseek-reasoner)
+        # For deepseek-reasoner: thinking is automatic, no extra_body needed
+        extra_body = None
         if config.supports_reasoning and req.enable_thinking:
-             # DeepSeek R1 often triggers reasoning automatically or via specific model endpoints
-             # but "thinking" tokens are usually handled natively.
-             # If manual "thinking" trigger needed:
-             pass 
+            # Only add extra_body for deepseek-chat (R1 models have automatic reasoning)
+            if not req.model.startswith("deepseek-reasoner"):
+                extra_body = {"thinking": {"type": "enabled"}}
 
         req.messages = messages
-        
+
         client = OpenAI(
             api_key=api_key,
             base_url="https://api.deepseek.com"
         )
-        
+
         # Reuse OpenAI Logic which handles json_mode = response_format={"type": "json_object"}
-        return OpenAIProvider.call(req, client)
+        return OpenAIProvider.call(req, client, extra_body=extra_body)
 
 
 class OllamaProvider:
