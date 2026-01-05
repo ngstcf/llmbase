@@ -421,6 +421,7 @@
                 <h1>LLM Services</h1>
                 Unified API for Multiple LLM Providers<br>
                 Build once, run anywhere: One API for all your LLMs, cloud or local<br>
+                <a href="https://github.com/ngstcf/llmbase" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">📦 Open Source on GitHub</a><br>
                 <div class="version">v1.6.0 (Conditional Flask - Library Mode)</div>
             </div>
         </header>
@@ -831,7 +832,34 @@ print(data)
                 </div>
 
                 <div class="usage-example">
-                    <h3>Method 4: Streaming with JSON Mode (Advanced)</h3>
+                    <h3>Method 4: Reasoning Models (o1, gpt-5)</h3>
+                    <p>Best for complex logic, math, and multi-step reasoning. OpenAI supports <code>reasoning_effort</code> levels (low/medium/high).</p>
+                    <div class="example-code">
+                        <pre>from llmservices import LLMService, LLMRequest
+
+# OpenAI o1/gpt-5 with reasoning effort control
+llm_request = LLMRequest(
+    provider='openai',
+    model='o1',  # or 'gpt-5'
+    prompt='Solve this step by step: What is 12345 + 67890?',
+    enable_thinking=True,
+    reasoning_effort='high',  # Options: 'low', 'medium', 'high'
+    max_tokens=2000
+)
+
+response = LLMService.call(llm_request)
+
+print(f"Answer: {response.content}")
+print(f"Reasoning: {response.reasoning_content}")
+print(f"Tokens: {response.usage}")</pre>
+                    </div>
+                    <div class="alert-box alert-info">
+                        <strong>Provider Differences:</strong> OpenAI supports <code>reasoning_effort</code> levels for o1/gpt-5. DeepSeek uses boolean <code>enable_thinking</code> (no effort levels). Anthropic's extended thinking is automatic.
+                    </div>
+                </div>
+
+                <div class="usage-example">
+                    <h3>Method 5: Streaming with JSON Mode (Advanced)</h3>
                     <p>Best for real-time JSON responses. Shows SSE parsing to handle the <code>[DONE]</code> marker.</p>
                     <div class="example-code">
                         <pre>from llmservices import LLMService, LLMRequest
