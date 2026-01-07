@@ -951,24 +951,30 @@ class XAIProvider:
 
 
 class OllamaProvider:
-    """Custom Ollama endpoint (OpenAI-compatible)"""
-    
+    """Custom Ollama endpoint (OpenAI-compatible)
+
+    Supports both authenticated and unauthenticated Ollama instances:
+    - Local Ollama: typically doesn't require authentication
+    - Remote Ollama: may require OLLAMA_API_KEY for authentication
+
+    Only OLLAMA_CHAT_ENDPOINT is required. OLLAMA_API_KEY is optional.
+    """
+
     @staticmethod
     def call(req: LLMRequest) -> LLMResponse:
         endpoint = os.environ.get("OLLAMA_CHAT_ENDPOINT")
         api_key = os.environ.get("OLLAMA_API_KEY")
-        
-        if not endpoint or not api_key:
-            raise Exception("Ollama endpoint not configured")
-        
+
+        if not endpoint:
+            raise Exception("Ollama endpoint not configured. Set OLLAMA_CHAT_ENDPOINT environment variable.")
+
         messages = req.messages if req.messages else [{"role": "user", "content": req.prompt}]
         if req.system_prompt and not any(m.get("role") == "system" for m in messages):
             messages.insert(0, {"role": "system", "content": req.system_prompt})
-        
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {api_key}"
-        }
+
+        headers = {"Content-Type": "application/json"}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
         
         payload = {
             "model": req.model,
