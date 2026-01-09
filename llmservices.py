@@ -4,8 +4,10 @@ import requests
 import time
 import random
 import functools
+import logging
+import uuid
 from typing import Dict, Any, Optional, Generator, List, Callable, TypeVar
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -21,6 +23,33 @@ from google.genai import types as genai_types
 
 # Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+
+# Configure logging for llmbase
+LOG_LEVEL = os.environ.get("LLM_LOG_LEVEL", "INFO").upper()
+LLM_DEBUG = os.environ.get("LLM_DEBUG", "false").lower() in ("true", "1", "yes", "on")
+
+# Create logger
+logger = logging.getLogger("llmbase")
+logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+
+# Add console handler if not already present
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    handler.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+# Log debug mode status
+if LLM_DEBUG:
+    logger.debug("Debug mode enabled. Verbose logging active.")
 
 # Initialization
 load_dotenv(Path(__file__).parent / ".env")
@@ -196,23 +225,18 @@ def _register_flask_routes():
 
     @app.route('/health', methods=['GET'])
     def health_check():
-        return jsonify({
+        """Enhanced health check with detailed status"""
+        status = LLMConfig.get_status()
+        status.update({
             'status': 'healthy',
             'timestamp': datetime.now().isoformat(),
-            'providers': {
-                'openai': clients.openai is not None,
-                'azure': clients.azure is not None,
-                'anthropic': clients.anthropic is not None,
-                'gemini': clients.gemini is not None,
-                'deepseek': os.environ.get("DEEPSEEK_API_KEY") is not None,
-                'xai': os.environ.get("XAI_API_KEY") is not None,
-                'perplexity': os.environ.get("PERPLEXITY_API_KEY") is not None,
-                'ollama': os.environ.get("OLLAMA_CHAT_ENDPOINT") is not None
-            },
-            'circuit_breakers': {
-                 name: breaker.state for name, breaker in resilience_manager.breakers.items()
-            }
         })
+        return jsonify(status)
+
+    @app.route('/api/config/status', methods=['GET'])
+    def config_status():
+        """Get detailed configuration status for debugging"""
+        return jsonify(LLMConfig.get_status())
 
 
 # ============================================================================
@@ -435,7 +459,71 @@ class LLMRequest:
     messages: Optional[List[Dict[str, str]]] = None
     reasoning_effort: Optional[str] = None
     enable_thinking: bool = True
-    json_mode: bool = False  
+    json_mode: bool = False
+    # Debugging fields
+    request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class LLMMetadata:
+    """Request/response metadata for debugging and transparency"""
+    request_id: str
+    start_time: float
+    end_time: float = 0.0
+    duration_ms: float = 0.0
+    provider: str = ""
+    model: str = ""
+    retry_count: int = 0
+    status_code: int = 0
+    tokens_used: Dict[str, int] = field(default_factory=dict)
+    finish_reason: str = ""
+    reasoning_tokens: bool = False
+    cache_hit: bool = False
+    error_message: str = ""
+    response_headers: Dict[str, str] = field(default_factory=dict)
+    rate_limit_remaining: Optional[int] = None
+    request_url: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "request_id": self.request_id,
+            "start_time": self.start_time,
+            "end_time": self.end_time,
+            "duration_ms": self.duration_ms,
+            "provider": self.provider,
+            "model": self.model,
+            "retry_count": self.retry_count,
+            "status_code": self.status_code,
+            "tokens_used": self.tokens_used,
+            "finish_reason": self.finish_reason,
+            "reasoning_tokens": self.reasoning_tokens,
+            "cache_hit": self.cache_hit,
+            "error_message": self.error_message,
+            "rate_limit_remaining": self.rate_limit_remaining,
+            "request_url": self.request_url
+        }
+
+
+@dataclass
+class LLMTiming:
+    """Performance timing metrics for requests"""
+    dns_lookup_ms: float = 0.0
+    tcp_connect_ms: float = 0.0
+    tls_handshake_ms: float = 0.0
+    time_to_first_token_ms: float = 0.0
+    total_duration_ms: float = 0.0
+    provider_processing_ms: float = 0.0
+
+    def to_dict(self) -> Dict[str, float]:
+        return {
+            "dns_lookup_ms": self.dns_lookup_ms,
+            "tcp_connect_ms": self.tcp_connect_ms,
+            "tls_handshake_ms": self.tls_handshake_ms,
+            "time_to_first_token_ms": self.time_to_first_token_ms,
+            "total_duration_ms": self.total_duration_ms,
+            "provider_processing_ms": self.provider_processing_ms
+        }
 
 
 @dataclass
@@ -447,6 +535,12 @@ class LLMResponse:
     usage: Optional[Dict[str, int]] = None
     reasoning_content: Optional[str] = None
     finish_reason: Optional[str] = None
+    # Enhanced debugging fields
+    request_id: str = ""
+    response_headers: Optional[Dict[str, str]] = None
+    rate_limit_remaining: Optional[int] = None
+    timing: Optional[LLMTiming] = None
+    metadata: Optional[LLMMetadata] = None
 
 
 # ============================================================================
@@ -1042,6 +1136,127 @@ class OllamaProvider:
 class EmptyLLMResponseError(Exception):
     """Raised when the LLM provider returns an empty response (often due to safety filters)"""
     pass
+
+
+class LLMError(Exception):
+    """Enhanced error with context for debugging"""
+
+    def __init__(
+        self,
+        message: str,
+        provider: Optional[str] = None,
+        model: Optional[str] = None,
+        status_code: Optional[int] = None,
+        response_body: Optional[str] = None,
+        request_id: Optional[str] = None,
+        error_code: Optional[str] = None
+    ):
+        self.message = message
+        self.provider = provider
+        self.model = model
+        self.status_code = status_code
+        self.response_body = response_body
+        self.request_id = request_id
+        self.error_code = error_code
+        super().__init__(self.format_message())
+
+    def format_message(self) -> str:
+        parts = []
+        if self.provider:
+            parts.append(f"Provider: {self.provider}")
+        if self.model:
+            parts.append(f"Model: {self.model}")
+        if self.status_code:
+            parts.append(f"Status: {self.status_code}")
+        if self.request_id:
+            parts.append(f"RequestID: {self.request_id}")
+        if self.error_code:
+            parts.append(f"ErrorCode: {self.error_code}")
+
+        prefix = " | ".join(parts)
+        if prefix:
+            return f"[{prefix}] {self.message}"
+        return self.message
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "message": self.message,
+            "provider": self.provider,
+            "model": self.model,
+            "status_code": self.status_code,
+            "request_id": self.request_id,
+            "error_code": self.error_code
+        }
+
+
+# ============================================================================
+# CONFIGURATION STATUS
+# ============================================================================
+
+class LLMConfig:
+    """Configuration transparency and status checking"""
+
+    VERSION = "v1.9.0"
+
+    @staticmethod
+    def get_status() -> Dict[str, Any]:
+        """Get comprehensive configuration status for debugging"""
+        providers_configured = []
+        providers_status = {}
+
+        # Check each provider
+        provider_checks = {
+            "openai": "OPENAI_API_KEY",
+            "azure_oai": ["AZURE_OAI_ENDPOINT", "AZURE_OAI_KEY"],
+            "anthropic": "ANTHROPIC_API_KEY",
+            "gemini": "GEMINI_API_KEY",
+            "deepseek": "DEEPSEEK_API_KEY",
+            "xai": "XAI_API_KEY",
+            "perplexity": "PERPLEXITY_API_KEY",
+            "ollama": "OLLAMA_CHAT_ENDPOINT"
+        }
+
+        for provider, keys in provider_checks.items():
+            if isinstance(keys, str):
+                keys = [keys]
+
+            is_configured = all(os.environ.get(k) for k in keys)
+            if is_configured:
+                providers_configured.append(provider)
+                providers_status[provider] = {"configured": True}
+            else:
+                providers_status[provider] = {
+                    "configured": False,
+                    "missing_keys": [k for k in keys if not os.environ.get(k)]
+                }
+
+        return {
+            "version": LLMConfig.VERSION,
+            "python_path": os.sys.path if hasattr(os, 'sys') else "unknown",
+            "providers_configured": providers_configured,
+            "providers_status": providers_status,
+            "environment": {
+                "LLM_API_MODE": API_MODE,
+                "LLM_LOG_LEVEL": LOG_LEVEL,
+                "LLM_DEBUG": LLM_DEBUG,
+                "config_file": os.environ.get("LLM_CONFIG_FILE", "llm_config.json"),
+                "config_loaded": bool(PROVIDER_CONFIGS)
+            },
+            "clients_initialized": {
+                "openai": clients.openai is not None,
+                "azure": clients.azure is not None,
+                "anthropic": clients.anthropic is not None,
+                "gemini": clients.gemini is not None
+            },
+            "circuit_breakers": {
+                name: {
+                    "state": breaker.state,
+                    "failure_count": breaker.failure_count,
+                    "failure_threshold": breaker.failure_threshold
+                }
+                for name, breaker in resilience_manager.breakers.items()
+            }
+        }
 
 # ============================================================================
 # UNIFIED LLM SERVICE

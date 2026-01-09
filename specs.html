@@ -410,6 +410,7 @@
             <a href="#resilience">Resilience</a>
             <a href="#setup">Setup</a>
             <a href="#api">API</a>
+            <a href="#debugging">Debugging</a>
             <a href="#best-practices">Best Practices</a>
             <a href="#usage">Usage Modes</a>
             <a href="#integration">Integration</a>
@@ -422,7 +423,7 @@
                 Unified API for Multiple LLM Providers<br>
                 Build once, run anywhere: One API for all your LLMs, cloud or local<br>
                 <a href="https://github.com/ngstcf/llmbase" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">📦 Open Source on GitHub</a><br>
-                <div class="version">v1.8.0 (xAI Grok Support)</div>
+                <div class="version">v1.9.0 (Debugging & Transparency)</div>
             </div>
         </header>
 
@@ -444,6 +445,7 @@
                     <li><strong>Resilience:</strong> Automatic retries and circuit breakers for high availability.</li>
                     <li><strong>Advanced Logic:</strong> Support for "Thinking" models and streaming responses.</li>
                     <li><strong>Conditional Flask:</strong> Use as a library (no Flask required) or API server (Flask optional).</li>
+                    <li><strong>Debugging & Transparency:</strong> Built-in logging, request tracking, performance metrics, and configuration status endpoints.</li>
                 </ul>
             </section>
 
@@ -476,6 +478,10 @@
                     <div class="provider-card">
                         <div class="provider-name">xAI / Grok</div>
                         <div class="provider-models">Grok 3, 4</div>
+                    </div>
+                    <div class="provider-card">
+                        <div class="provider-name">Perplexity</div>
+                        <div class="provider-models">Sonar</div>
                     </div>
                     <div class="provider-card">
                         <div class="provider-name">Ollama</div>
@@ -653,6 +659,158 @@ LLM_API_MODE=false</div>
 {
     "config_file": "llm_config.json"
 }</div>
+            </section>
+
+            <section id="debugging" class="card full-width">
+                <div class="card-header">
+                    <div class="card-icon">🔍</div>
+                    <div>
+                        <h2>Debugging & Transparency</h2>
+                        <p>Comprehensive debugging tools for monitoring, troubleshooting, and optimizing your LLM integrations.</p>
+                    </div>
+                </div>
+
+                <h3>Environment Variables</h3>
+                <p>Control logging and debugging behavior through environment variables in your <code>.env</code> file.</p>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Values</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="param-badge">LLM_LOG_LEVEL</span></td>
+                            <td><code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>ERROR</code></td>
+                            <td>Set the logging verbosity level. Default: <code>INFO</code></td>
+                        </tr>
+                        <tr>
+                            <td><span class="param-badge">LLM_DEBUG</span></td>
+                            <td><code>true</code>, <code>false</code></td>
+                            <td>Enable verbose logging with request/response details. Default: <code>false</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="alert-box alert-warning">
+                    <strong>Production Warning:</strong> Avoid using <code>LLM_DEBUG=true</code> or <code>LLM_LOG_LEVEL=DEBUG</code> in production as they may log sensitive data including request payloads and response content.
+                </div>
+
+                <h3>Configuration Status Endpoint</h3>
+                <p>Check your configuration and provider status programmatically.</p>
+                <div class="code-block">GET /api/config/status</div>
+
+                <h4>Response Example:</h4>
+                <div class="example-code">
+                    <pre>{
+  "version": "v1.9.0",
+  "providers_configured": ["openai", "anthropic", "deepseek"],
+  "providers_status": {
+    "openai": {"configured": true},
+    "anthropic": {"configured": true},
+    "ollama": {
+      "configured": false,
+      "missing_keys": ["OLLAMA_CHAT_ENDPOINT"]
+    }
+  },
+  "environment": {
+    "LLM_API_MODE": false,
+    "LLM_LOG_LEVEL": "INFO",
+    "LLM_DEBUG": false,
+    "config_loaded": true
+  },
+  "clients_initialized": {
+    "openai": true,
+    "anthropic": true,
+    "gemini": false
+  },
+  "circuit_breakers": {
+    "openai": {
+      "state": "CLOSED",
+      "failure_count": 0,
+      "failure_threshold": 5
+    }
+  }
+}</pre>
+                </div>
+
+                <h3>Request Tracking</h3>
+                <p>Every request automatically gets a unique <code>request_id</code> for tracing.</p>
+                <div class="example-code">
+                    <pre>from llmservices import LLMService, LLMRequest
+
+req = LLMRequest(
+    provider="openai",
+    model="gpt-4o",
+    prompt="Hello"
+)
+
+# Access the auto-generated request ID
+print(f"Request ID: {req.request_id}")
+
+response = LLMService.call(req)
+
+# Response includes debugging information
+print(f"Request ID: {response.request_id}")
+print(f"Finish Reason: {response.finish_reason}")
+print(f"Usage: {response.usage}")
+if response.timing:
+    print(f"Duration: {response.timing.total_duration_ms}ms")
+if response.metadata:
+    print(f"Metadata: {response.metadata.to_dict()}")</pre>
+                </div>
+
+                <h3>Enhanced Error Handling</h3>
+                <p>The <code>LLMError</code> class provides detailed error context for debugging.</p>
+                <div class="example-code">
+                    <pre>from llmservices import LLMService, LLMRequest, LLMError
+
+try:
+    req = LLMRequest(provider="openai", model="gpt-4o", prompt="Hello")
+    response = LLMService.call(req)
+except LLMError as e:
+    # Access structured error information
+    print(f"Error: {e.message}")
+    print(f"Provider: {e.provider}")
+    print(f"Model: {e.model}")
+    print(f"Status Code: {e.status_code}")
+    print(f"Request ID: {e.request_id}")
+    print(f"Error Code: {e.error_code}")
+
+    # Convert to dictionary for logging
+    error_dict = e.to_dict()
+    import json
+    print(json.dumps(error_dict, indent=2))</pre>
+                </div>
+
+                <h3>Logging Examples</h3>
+                <p>Enable different log levels based on your needs:</p>
+                <div class="example-code">
+                    <pre># .env file for development
+LLM_LOG_LEVEL=DEBUG
+LLM_DEBUG=true
+
+# .env file for production
+LLM_LOG_LEVEL=WARNING
+LLM_DEBUG=false</pre>
+                </div>
+
+                <h3>Debugging Use Cases</h3>
+                <ul class="feature-list">
+                    <li><div><strong>Track Requests:</strong> Use <code>request_id</code> to trace requests through your system</div></li>
+                    <li><div><strong>Monitor Performance:</strong> Check <code>response.timing</code> for latency metrics</div></li>
+                    <li><div><strong>Debug Errors:</strong> Use <code>LLMError</code> for structured error information</div></li>
+                    <li><div><strong>Verify Configuration:</strong> Call <code>LLMConfig.get_status()</code> to check setup</div></li>
+                    <li><div><strong>Monitor Token Usage:</strong> Check <code>response.usage</code> for cost tracking</div></li>
+                    <li><div><strong>Trace Failures:</strong> Use circuit breaker status to identify provider issues</div></li>
+                </ul>
+
+                <div class="alert-box alert-info">
+                    <strong>Programmatic Access:</strong> You can also call <code>LLMConfig.get_status()</code> directly in your Python code to check configuration status without making an HTTP request.
+                </div>
             </section>
 
             <section id="best-practices" class="card">
@@ -1059,7 +1217,7 @@ if __name__ == "__main__":
         </div>
 
         <footer>
-            <p>Unified LLM Services API | v1.8.0 (xAI Grok Support) | By Ng Chong </p>
+            <p>Unified LLM Services API | v1.9.0 (Debugging & Transparency) | By Ng Chong </p>
         </footer>
     </div>
 </body>
