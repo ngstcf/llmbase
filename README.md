@@ -8,7 +8,7 @@ Build once, run anywhere: One API for all your LLMs, cloud or local
 
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.6.0-orange)]https://github.com/ngstcf/llmservices)
+[![Version](https://img.shields.io/badge/version-1.9.0-orange)]https://github.com/ngstcf/llmbase)
 [![Documentation](https://img.shields.io/badge/docs-online-blue)](https://c3.unu.edu/projects/ai/llmbase/)
 
 [Features](#-key-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Documentation](#-documentation) • [Examples](#-examples)
@@ -19,13 +19,14 @@ Build once, run anywhere: One API for all your LLMs, cloud or local
 
 ## 🌟 Key Features
 
-- **🔄 Multi-Provider Support**: OpenAI, Azure OpenAI, Anthropic, Google Gemini, DeepSeek, Perplexity, Ollama
+- **🔄 Multi-Provider Support**: OpenAI, Azure OpenAI, Anthropic, Google Gemini, DeepSeek, xAI/Grok, Perplexity, Ollama
 - **📦 Structured Output**: Built-in `json_mode` ensures valid JSON responses across all providers
 - **🔌 Dual Mode**: Use as a Python library (no Flask) or HTTP API server (optional Flask)
 - **🛡️ Resilience**: Automatic retries with exponential backoff and circuit breakers
 - **🧠 Advanced Features**: Support for reasoning models, streaming, extended thinking
 - **🔧 Configuration-Driven**: Hot-reload model configs without code changes
 - **🌐 CORS-Ready**: Built-in CORS support for web applications
+- **🔍 Debugging & Transparency**: Built-in logging, request tracking, performance metrics, and configuration status endpoints
 
 ---
 
@@ -144,6 +145,10 @@ OLLAMA_MODELS_ENDPOINT=http://localhost:11434/api/models
 LLM_CONFIG_FILE=llm_config.json
 LLM_API_MODE=false  # Set to true for API server mode
 FLASK_SECRET_KEY=your-secret-key
+
+# Debugging & Logging (Optional)
+LLM_LOG_LEVEL=INFO  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+LLM_DEBUG=false     # Enable verbose logging for debugging
 ```
 
 ### Model Configuration
@@ -202,6 +207,7 @@ Create `llm_config.json`:
 | Anthropic | Claude models |
 | Google Gemini | Gemini models |
 | DeepSeek | Chat and reasoning models |
+| xAI / Grok | Grok models |
 | Perplexity | Sonar models |
 | Ollama | Local models |
 
@@ -241,14 +247,48 @@ for chunk in LLMService.stream(req):
 ### Error Handling
 
 ```python
-from llmservices import CircuitBreakerOpenException
+from llmservices import CircuitBreakerOpenException, LLMError
 
 try:
     response = LLMService.call(req)
+except LLMError as e:
+    # Enhanced error with context
+    print(f"Error: {e.message}")
+    print(f"Provider: {e.provider}")
+    print(f"Status: {e.status_code}")
+    print(f"Request ID: {e.request_id}")
 except CircuitBreakerOpenException as e:
     print(f"Service unavailable: {e}")
 except Exception as e:
     print(f"Error: {e}")
+```
+
+### Debugging
+
+```python
+from llmservices import LLMService, LLMRequest, LLMConfig
+
+# Check configuration status
+status = LLMConfig.get_status()
+print(f"Version: {status['version']}")
+print(f"Providers: {status['providers_configured']}")
+
+# Request with tracking
+req = LLMRequest(
+    provider="openai",
+    model="gpt-4o",
+    prompt="Hello"
+)
+print(f"Request ID: {req.request_id}")
+
+response = LLMService.call(req)
+
+# Access debugging information
+print(f"Request ID: {response.request_id}")
+print(f"Usage: {response.usage}")
+print(f"Finish Reason: {response.finish_reason}")
+if response.timing:
+    print(f"Duration: {response.timing.total_duration_ms}ms")
 ```
 
 ---
@@ -284,6 +324,12 @@ class LLMResponse:
     usage: Optional[Dict[str, int]]    # Token usage
     reasoning_content: Optional[str]   # Thinking content
     finish_reason: Optional[str]       # Stop reason
+    # Debugging fields
+    request_id: str                    # Unique request identifier
+    response_headers: Optional[Dict[str, str]]  # HTTP response headers
+    rate_limit_remaining: Optional[int]         # Rate limit info
+    timing: Optional[LLMTiming]        # Performance metrics
+    metadata: Optional[LLMMetadata]    # Request metadata
 ```
 
 ### LLMService Methods
@@ -335,7 +381,8 @@ Automatically blocks failing providers:
 | `/api/providers` | GET | List providers |
 | `/api/providers/<provider>/models` | GET | List models |
 | `/api/config/reload` | POST | Reload config |
-| `/health` | GET | Health check |
+| `/api/config/status` | GET | Get configuration status |
+| `/health` | GET | Health check with detailed status |
 
 ---
 
@@ -384,6 +431,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📝 Changelog
 
+### v1.9.0 (Debugging & Transparency)
+- Added structured logging system with configurable log levels
+- Added `LLMMetadata` class for request/response tracking
+- Added `LLMTiming` class for performance metrics
+- Added `LLMError` class with enhanced error context
+- Added `LLMConfig.get_status()` for configuration transparency
+- Added debug mode (`LLM_DEBUG`) for verbose logging
+- Enhanced health check endpoint with detailed status
+- Added `/api/config/status` endpoint for debugging
+- Added `request_id` tracking for all requests
+- Updated `LLMResponse` with debugging fields
+
+### v1.8.0 (xAI Grok Support)
+- Added xAI/Grok provider support
+- Added Grok 4 reasoning model support
+- Fixed Ollama API key to be optional
+
+### v1.7.0 (DeepSeek Reasoning)
+- Added DeepSeek provider support
+- Added DeepSeek reasoning model (R1) support
+- Added thinking tokens support via extra_body
+
 ### v1.6.0 (Conditional Flask - Library Mode)
 - Added conditional Flask imports
 - Library mode now works without Flask
@@ -398,7 +467,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**Built with ❤️ for the AI community**
+**Built for the AI community**
 
 [⬆ Back to Top](#llm-services)
 
