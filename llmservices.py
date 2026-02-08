@@ -901,7 +901,9 @@ class GeminiProvider:
             generation_config.response_mime_type = "application/json"
         
         if config.supports_reasoning and req.enable_thinking:
-            generation_config.thinking_config = {"mode": "deep"}
+            generation_config.thinking_config = genai_types.ThinkingConfig(
+                include_thoughts=True
+            )
         
         if req.messages:
             contents = []
@@ -929,13 +931,17 @@ class GeminiProvider:
             )
             
             content_text = ""
+            reasoning_text = ""
             if hasattr(response, 'text'):
                 content_text = response.text
             elif hasattr(response, 'candidates') and response.candidates:
                 for part in response.candidates[0].content.parts:
                     if hasattr(part, 'text'):
-                        content_text += part.text
-            
+                        if hasattr(part, 'thought') and part.thought:
+                            reasoning_text += part.text
+                        else:
+                            content_text += part.text
+
             return LLMResponse(
                 content=content_text,
                 model=req.model,
@@ -945,25 +951,25 @@ class GeminiProvider:
                     "completion_tokens": response.usage_metadata.candidates_token_count,
                     "total_tokens": response.usage_metadata.total_token_count
                 } if hasattr(response, 'usage_metadata') and response.usage_metadata else None,
+                reasoning_content=reasoning_text if reasoning_text else None,
                 finish_reason=response.candidates[0].finish_reason if hasattr(response, 'candidates') and response.candidates else None
             )
     
     @staticmethod
     def stream(req: LLMRequest) -> Generator[str, None, None]:
         stream = GeminiProvider.call(req)
-        
+
         for chunk in stream:
-            text_content = ""
-            if hasattr(chunk, 'text') and chunk.text:
-                text_content = chunk.text
-            elif hasattr(chunk, 'candidates') and chunk.candidates:
+            if hasattr(chunk, 'candidates') and chunk.candidates:
                 for part in chunk.candidates[0].content.parts:
                     if hasattr(part, 'text') and part.text:
-                        text_content += part.text
-            
-            if text_content:
-                yield f"data: {json.dumps({'chunk': text_content})}\n\n"
-        
+                        if hasattr(part, 'thought') and part.thought:
+                            yield f"data: {json.dumps({'reasoning': part.text})}\n\n"
+                        else:
+                            yield f"data: {json.dumps({'chunk': part.text})}\n\n"
+            elif hasattr(chunk, 'text') and chunk.text:
+                yield f"data: {json.dumps({'chunk': chunk.text})}\n\n"
+
         yield "data: [DONE]\n\n"
 
 
