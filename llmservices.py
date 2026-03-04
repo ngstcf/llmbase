@@ -298,7 +298,28 @@ def get_default_config() -> Dict:
                     "max_tokens": 16384,
                     "supports_streaming": True,
                     "supports_reasoning": False,
-                    "temperature_default": 0.3
+                    "temperature_default": 0.3,
+                    "uses_completion_tokens": False
+                }
+            }
+        },
+        "azure_oai": {
+            "api_base": "https://azure.openai.com",
+            "default_model": "gpt-4o",
+            "models": {
+                "gpt-5": {
+                    "max_tokens": 100000,
+                    "supports_streaming": True,
+                    "supports_reasoning": True,
+                    "temperature_default": 1.0,
+                    "uses_completion_tokens": True
+                },
+                "gpt-4o": {
+                    "max_tokens": 16384,
+                    "supports_streaming": True,
+                    "supports_reasoning": False,
+                    "temperature_default": 0.3,
+                    "uses_completion_tokens": False
                 }
             }
         },
@@ -310,7 +331,8 @@ def get_default_config() -> Dict:
                     "max_tokens": 8192,
                     "supports_streaming": True,
                     "supports_reasoning": False,
-                    "temperature_default": 0.3
+                    "temperature_default": 0.3,
+                    "uses_completion_tokens": False
                 }
             }
         }
@@ -703,11 +725,15 @@ class OpenAIProvider:
             else:
                 messages.insert(0, {"role": "system", "content": json_instruction})
 
-        # Reasoning Model Handling (o1, etc)
-        if config.supports_reasoning:
+        # Reasoning Model Handling (o1, etc) and models that use max_completion_tokens (gpt-5)
+        uses_completion = config.supports_reasoning or config.uses_completion_tokens
+        if uses_completion:
             params["max_completion_tokens"] = req.max_tokens or config.max_tokens
             if req.reasoning_effort:
                 params["reasoning_effort"] = req.reasoning_effort
+            # Temperature is not supported for reasoning models
+            if not config.supports_reasoning:
+                params["temperature"] = req.temperature if req.temperature is not None else config.temperature_default
         else:
             params["max_tokens"] = req.max_tokens or config.max_tokens
             params["temperature"] = req.temperature if req.temperature is not None else config.temperature_default
