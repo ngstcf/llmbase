@@ -66,90 +66,123 @@
       }
     }
   },
-  "anthropic": {
-    "api_version": "2023-06-01",
-    "default_model": "claude-sonnet-4.5-20250929",
+  "azure_oai": {
+    "api_base": "https://azure.openai.com",
+    "default_model": "gpt-4o",
     "models": {
-      "claude-opus-4.5-20251101": {
-        "max_tokens": 8192,
-        "supports_streaming": true,
-        "supports_reasoning": false,
-        "temperature_default": 0.3,
-        "uses_completion_tokens": false,
-        "supports_extended_thinking": true,
-        "knowledge_cutoff": "Feb 2025"
-      },
-      "claude-haiku-4.5-20251015": {
-        "max_tokens": 8192,
-        "supports_streaming": true,
-        "supports_reasoning": false,
-        "temperature_default": 0.3,
-        "uses_completion_tokens": false,
-        "supports_extended_thinking": false,
-        "knowledge_cutoff": "Feb 2025"
-      },
-      "claude-sonnet-4.5-20250929": {
-        "max_tokens": 8192,
-        "supports_streaming": true,
-        "supports_reasoning": false,
-        "temperature_default": 0.3,
-        "uses_completion_tokens": false,
-        "supports_extended_thinking": true,
-        "knowledge_cutoff": "Feb 2025"
-      },
-      "claude-opus-4.1-20250805": {
-        "max_tokens": 8192,
-        "supports_streaming": true,
-        "supports_reasoning": false,
-        "temperature_default": 0.3,
-        "uses_completion_tokens": false,
-        "supports_extended_thinking": true,
-        "knowledge_cutoff": "Feb 2025"
-      },
-      "claude-sonnet-4-20250522": {
-        "max_tokens": 8192,
-        "supports_streaming": true,
-        "supports_reasoning": false,
-        "temperature_default": 0.3,
-        "uses_completion_tokens": false,
-        "supports_extended_thinking": true,
-        "knowledge_cutoff": "Feb 2025"
-      },
-      "claude-opus-4-20250522": {
-        "max_tokens": 8192,
-        "supports_streaming": true,
-        "supports_reasoning": false,
-        "temperature_default": 0.3,
-        "uses_completion_tokens": false,
-        "supports_extended_thinking": true,
-        "knowledge_cutoff": "Feb 2025"
-      },
-      "claude-sonnet-3.7-20250224": {
-        "max_tokens": 8192,
+      "gpt-5.2": {
+        "max_tokens": 100000,
         "supports_streaming": true,
         "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2025"
+      },
+      "gpt-5.1": {
+        "max_tokens": 100000,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2025"
+      },
+      "gpt-5": {
+        "max_tokens": 100000,
+        "supports_streaming": true,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Aug 2025"
+      },
+      "o1": {
+        "max_tokens": 100000,
+        "supports_streaming": false,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      },
+      "o1-preview": {
+        "max_tokens": 100000,
+        "supports_streaming": false,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      },
+      "o1-mini": {
+        "max_tokens": 65536,
+        "supports_streaming": false,
+        "supports_reasoning": true,
+        "temperature_default": 1.0,
+        "uses_completion_tokens": true,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      },
+      "gpt-4o": {
+        "max_tokens": 16384,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      },
+      "gpt-4o-mini": {
+        "max_tokens": 16384,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": false,
+        "knowledge_cutoff": "Oct 2023"
+      }
+    }
+  },
+  "anthropic": {
+    "api_version": "2023-06-01",
+    "default_model": "claude-sonnet-4.6",
+    "models": {
+      "claude-opus-4.6": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
         "temperature_default": 0.3,
         "uses_completion_tokens": false,
         "supports_extended_thinking": true,
-        "knowledge_cutoff": "Aug 2024"
+        "knowledge_cutoff": "Feb 2025"
       },
-      "claude-3-5-sonnet-20241022": {
+      "claude-haiku-4.5": {
         "max_tokens": 8192,
         "supports_streaming": true,
         "supports_reasoning": false,
         "temperature_default": 0.3,
         "uses_completion_tokens": false,
         "supports_extended_thinking": false,
-        "knowledge_cutoff": "Apr 2024"
+        "knowledge_cutoff": "Feb 2025"
       },
-      "claude-3-5-haiku-20241022": {
+      "claude-sonnet-4.6": {
         "max_tokens": 8192,
         "supports_streaming": true,
         "supports_reasoning": false,
         "temperature_default": 0.3,
         "uses_completion_tokens": false,
-        "supports_extended_thinking": false,
-        "knowledge_cutoff": "Jul 2024"
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
+      },
+      "claude-opus-4.6": {
+        "max_tokens": 8192,
+        "supports_streaming": true,
+        "supports_reasoning": false,
+        "temperature_default": 0.3,
+        "uses_completion_tokens": false,
+        "supports_extended_thinking": true,
+        "knowledge_cutoff": "Feb 2025"
       }
     }
   },
