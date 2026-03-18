@@ -1124,19 +1124,28 @@ class OllamaProvider:
             stream=req.stream
         )
         response.raise_for_status()
-        
+
         if req.stream:
             return response
-        
+
         data = response.json()
-        content = data["choices"][0]["message"]["content"]
-        
+
+        # Handle both OpenAI-compatible format (university endpoint) and native Ollama format
+        if "choices" in data:
+            # OpenAI-compatible format
+            content = data["choices"][0]["message"]["content"]
+            finish_reason = data["choices"][0].get("finish_reason")
+        else:
+            # Native Ollama format: {"message": {"content": "...", "role": "assistant"}, "done": true}
+            content = data["message"]["content"]
+            finish_reason = data.get("done_reason")
+
         return LLMResponse(
             content=content,
             model=req.model,
             provider=req.provider,
             usage=data.get("usage"),
-            finish_reason=data["choices"][0].get("finish_reason")
+            finish_reason=finish_reason
         )
     
     @staticmethod
